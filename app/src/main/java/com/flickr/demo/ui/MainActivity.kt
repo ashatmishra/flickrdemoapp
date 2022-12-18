@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
         binding.searchImage.setOnClickListener {
             binding.searchInput.setText("")
             binding.searchInput.isVisible = true
+            binding.searchInput.requestFocus()
+            inputMethodManager.showSoftInput(binding.searchInput, 0)
             binding.titleText.isVisible = false
             binding.searchImage.isVisible = false
         }

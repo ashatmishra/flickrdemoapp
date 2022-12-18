@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.flickr.demo.R
@@ -25,6 +26,10 @@ class PhotoViewFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             photoUrl = it.getString(ARG_PHOTO_URL).orEmpty()
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 

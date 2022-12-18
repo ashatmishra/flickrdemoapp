@@ -1,7 +1,5 @@
 <resources>
-    <string name="app_name">FlickrApp</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="empty_list">Empty List</string>
+    <string name="app_name">Flickr Findr</string>
+    <string name="empty_list">The search list is currently empty.</string>
     <string name="search">Search</string>
 </resources>

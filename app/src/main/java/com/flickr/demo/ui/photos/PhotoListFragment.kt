@@ -8,11 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.flickr.demo.R
 import com.flickr.demo.databinding.FragmentPhotoListBinding
 import com.flickr.demo.ui.MainActivity
@@ -28,8 +32,15 @@ class PhotoListFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by viewModels<FlickrPhotosViewModel>()
-    private lateinit var adapter: PhotoAdapter
-    lateinit var inputMethodManager: InputMethodManager
+    private lateinit var photoAdapter: PhotoAdapter
+    private lateinit var inputMethodManager: InputMethodManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            requireActivity().finish()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,16 +49,26 @@ class PhotoListFragment : Fragment() {
         _binding = FragmentPhotoListBinding.inflate(inflater, container, false)
         val view = binding.root
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        adapter = PhotoAdapter(requireContext()) {
+        photoAdapter = PhotoAdapter(requireContext()) {
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, PhotoViewFragment.newInstance(it))
                 .addToBackStack(PhotoViewFragment::class.java.simpleName)
                 .commit()
         }
-        binding.photoList.setHasFixedSize(false)
-        binding.photoList.layoutManager = GridLayoutManager(requireContext(), 2);
-        binding.photoList.adapter = adapter
+        binding.photoList.apply {
+            setHasFixedSize(false)
+            adapter = photoAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
+        }
+
         setupObservers()
+
+        requireActivity().onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                (requireActivity() as MainActivity).finish()
+            }
+        })
 
         return view
     }
@@ -63,13 +84,13 @@ class PhotoListFragment : Fragment() {
         lifecycleScope.launchWhenStarted {
             viewModel.photoStateFlow.collectLatest {
                 if (it != null) {
-                    adapter.submitData(lifecycle, it)
+                    photoAdapter.submitData(lifecycle, it)
                 }
             }
         }
 
         lifecycleScope.launch {
-            adapter.loadStateFlow.collectLatest { loadStates ->
+            photoAdapter.loadStateFlow.collectLatest { loadStates ->
                 binding.progressIndicator.isVisible = loadStates.refresh is LoadState.Loading || loadStates.append is LoadState.Loading
                 binding.emptyView.isVisible = loadStates.refresh is LoadState.NotLoading && loadStates.append.endOfPaginationReached
 

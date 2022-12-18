@@ -4,7 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -22,7 +24,7 @@ class PhotoViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
 ) {
     private val contentImageView = itemView.findViewById<ImageView>(R.id.contentImageView)
     private val titleView = itemView.findViewById<TextView>(R.id.titleView)
-    private val containerView = itemView.findViewById<ConstraintLayout>(R.id.containerView)
+    private val containerView = itemView.findViewById<LinearLayoutCompat>(R.id.containerView)
 
     fun bindTo(context: Context, photo: FlickrPhoto, onPhotoSelected: (String) -> Unit) {
         titleView.text = photo.title
